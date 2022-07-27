@@ -1,0 +1,350 @@
+---
+title: "Reporte Mieles"
+author: 'Carlos J. Gómez'
+date: "`r Sys.Date()`"
+format: 
+  html:
+    toc: true
+    toc-title: Tabla de contenidos
+    number-sections: true
+execute:
+  echo: false
+  warning: false
+---
+
+```{r}
+library(readxl)
+library(tidyverse)
+library(magrittr)
+library(FactoMineR)
+library(factoextra)
+library(missMDA)
+#library(pca3d)
+library(cluster)
+library(ggfortify)
+library(ggpubr)
+library(directlabels)
+library(ggrepel)
+```
+
+
+
+```{r}
+datos.or.botanico <- read_excel('datos.xlsx', sheet = 'Consolidado_origen_botanico') 
+datos.var <- read_excel('datos.xlsx', sheet = 'Consolidado_variable_wide') 
+datos.var$Cluster <- factor(datos.var$Cluster)
+#datos.var$Radiacion <- factor(datos.var$Radiacion)
+
+datos.or.botanico.wide<- datos.or.botanico %>% 
+  select(Muestra, Especie, Porcentaje) %>% 
+  mutate(log_Porcentaje = log(Porcentaje + 1)) %>% 
+  pivot_wider(values_from = Porcentaje, id_cols = Muestra, names_from = Especie) %>% 
+  mutate_at(c(2:66), ~replace(., is.na(.), 0)) 
+
+
+datos.or.botanico.wide <- data.frame(datos.or.botanico.wide)
+row.names(datos.or.botanico.wide) <- datos.or.botanico.wide$Muestra
+
+```
+
+# Análisis de componentes principales PCA
+
+:::{.callout-important}
+## Importante
+Este análisis de PCA no es tan relevante en la medida que se hayan identificado las especies monoflorales más importantes, tal como se muestra en la sección @sec-monoflorales
+:::
+
+```{r}
+pca.or.botanico <- prcomp(datos.or.botanico.wide %>% select(-Muestra), scale = TRUE)
+fviz_screeplot(pca.or.botanico, addlabels = TRUE, ylim = c(0, 20))
+fviz_pca_ind(pca.or.botanico, geom.ind = "point", 
+             col.ind = "#FC4E07", 
+             axes = c(1, 2), 
+             pointsize = 1.5,
+             repel = T) 
+```
+
+
+
+
+# Análisis con todos los datos sin diferenciar por origen botanico
+
+
+## Fenoles vs radiación
+
+```{r}
+# ggplot(datos.var, aes(x = factor(Radiacion, levels = c('SI', 'BAJA', 'MEDIA')), 
+#                       y = Fenoles)) +
+#   geom_boxplot() +
+#   labs(title = 'Fenoles versus nivel de radiación') +
+#   xlab('Nivel de radiación') +
+#   ylab('Fenoles [mg/g]') +
+#   theme_minimal()
+
+ggerrorplot(datos.var, x = "Radiacion", y = "Fenoles", 
+            desc_stat = "mean_se",
+            error.plot = "errorbar",            # Change error plot type
+            add = "mean"                        # Add mean points
+) +
+  xlab('Radiation Level') +
+  ylab('Phenols [mg/g]')
+
+```
+
+
+
+
+
+## FRAP vs radiación
+
+```{r}
+# ggplot(datos.var, aes(x = factor(Radiacion, levels = c('SI', 'BAJA', 'MEDIA')), 
+#                       y = FRAP)) +
+#   geom_boxplot() +
+#   labs(title = 'FRAP versus nivel de radiación') +
+#   xlab('Nivel de radiación') +
+#   ylab('FRAP [mM Fe]') +
+#   theme_minimal()
+
+ggerrorplot(datos.var, x = "Radiacion", y = "FRAP", 
+            desc_stat = "mean_se",
+            error.plot = "errorbar",            # Change error plot type
+            add = "mean"                        # Add mean points
+) +
+  xlab('Radiation Level') +
+  ylab('FRAP [mM Fe]')
+
+```
+
+
+
+# DPPH vs radiación
+
+```{r}
+# ggplot(datos.var, aes(x = factor(Radiacion, levels = c('SI', 'BAJA', 'MEDIA')), 
+#                       y = DPPH)) +
+#   geom_boxplot() +
+#   labs(title = 'DPPH versus nivel de radiación') +
+#   xlab('Nivel de radiación') +
+#   ylab('DPPH [mg eq ac asc/kg de miel]') +
+#   theme_minimal()
+
+ggerrorplot(datos.var, x = "Radiacion", y = "DPPH", 
+            desc_stat = "mean_se",
+            error.plot = "errorbar",            # Change error plot type
+            add = "mean"                        # Add mean points
+) +
+  xlab('Radiation Level') +
+  ylab('DPPH [mg eq asc acid/kg]')
+```
+
+
+
+
+
+# Gráficos de correlación sin irradación
+## Fenoles vs FRAP
+
+```{r}
+ggscatter(datos.var %>% filter(Radiacion == 'No treatment'), x = "Fenoles", y = "FRAP",
+          add = "reg.line",  # Add regressin line
+          add.params = list(color = "blue", fill = "lightgray"), # Customize reg. line
+          conf.int = TRUE # Add confidence interval
+) + stat_cor(method = "pearson") +
+    xlab('Phenols [mg/g]') +
+  ylab('FRAP [mM Fe]')
+
+# ggplot(datos.var %>% filter(Radiacion == 'No treatment'), aes(x = Fenoles, y = FRAP)) +
+#   geom_point() +
+#   geom_smooth(method = 'lm') +
+#   theme_minimal()
+```
+
+
+
+
+## Fenoles vs DPPH
+
+```{r}
+ggscatter(datos.var %>% filter(Radiacion == 'No treatment'), x = "Fenoles", y = "DPPH",
+          add = "reg.line",  # Add regressin line
+          add.params = list(color = "blue", fill = "lightgray"), # Customize reg. line
+          conf.int = TRUE # Add confidence interval
+) + stat_cor(method = "pearson") +
+  xlab('Phenols [mg/g]') +
+  ylab('DPPH [mg eq asc acid/kg]')
+
+# ggplot(datos.var %>% filter(Radiacion == 'SI'), aes(x = Fenoles, y = DPPH)) +
+#   geom_point() +
+#   geom_smooth(method = 'lm') +
+#   theme_minimal()
+```
+
+
+
+## FRAP vs DPPH
+
+```{r}
+ggscatter(datos.var %>% filter(Radiacion == 'No treatment'), x = "FRAP", y = "DPPH",
+          add = "reg.line",  # Add regressin line
+          add.params = list(color = "blue", fill = "lightgray"), # Customize reg. line
+          conf.int = TRUE # Add confidence interval
+) + stat_cor(method = "pearson") +
+  ylab('DPPH [mg eq asc acid/kg]') +
+  xlab('FRAP [mM Fe]')
+
+  
+
+
+# ggplot(datos.var %>% filter(Radiacion == 'SI'), aes(x = FRAP, y = DPPH)) +
+#   geom_point() +
+#   geom_smooth(method = 'lm') +
+#   theme_minimal()
+```
+
+
+
+
+# Análisis de mieles monoflorales (> 45%)
+(Sólo se muestran aquellas especies presentes en más de tres muestras)
+```{r}
+datos.monoflorales <- read_excel('datos.xlsx', sheet = 'Consolidado_origen_botanico_mod')
+```
+
+
+
+
+## ¿Cuáles son las especies más frecuentes en las muestras?
+[$n$ es el número de muestras que contienen la especie, sin considerar el porcentaje de la composición. Por ejemplo, de las 24 muestras: 21 de ellas contienen la especie *Lotus pedunculatus*]{.aside}
+
+```{r}
+datos.monoflorales %>% 
+  group_by(Especie) %>% 
+  summarise(n = n()) %>% 
+  filter(n > 3, Especie !='NN') %>% 
+  ggplot(aes(x = reorder(Especie, n), y = n)) + 
+  geom_bar(stat = 'identity', fill = 'blue') +
+  coord_flip() +
+  xlab('Specie') +
+  # ylab('N° de muestras que contienen la especie') +
+  # labs(title = 'Especies presentes (n > 3)') +
+  theme_minimal() +
+  geom_text(aes(label = n), hjust = 2, colour = "white")
+```
+
+
+
+
+
+
+## ¿Cuáles son las principales especies monoflorales presentes en las muestras?{#sec-monoflorales}
+
+```{r}
+datos.monoflorales %>% 
+  filter(Porcentaje > 45) %>% 
+  group_by(Especie) %>% 
+  filter(Especie != 'Aristotelia/Crinodendron') %>% 
+  summarise(n = n()) %>% 
+  ggplot(aes(x = reorder(Especie, n), y = n)) + 
+  geom_bar(stat = 'identity', fill = 'red') +
+  coord_flip() +
+  xlab('Specie') +
+  #labs(title = 'Mieles monoflorales (> 45%)') +
+  theme_minimal() +
+  geom_text(aes(label = n), hjust = 2, colour = "white")
+
+```
+
+
+
+## Análisis de variables en las muestras monoflorales
+
+```{r}
+datos.var <- read_excel('datos.xlsx', sheet = 'Consolidado_variable_wide')
+```
+
+
+
+### Análisis de radiación sobre Fenoles en base a origen botánico
+(No se consideran muestras 17, 34 y la especie *Aristotelia/Crinodendron*)
+
+```{r}
+# ggerrorplot(datos.var %>% filter(Muestra != 'M17', Muestra != 'M34', Especie != 'Aristotelia/Crinodendron'), x = "Radiacion", 
+#             y = 'Fenoles', 
+#             desc_stat = "mean_se", 
+#             color = "Especie",
+#             position = position_dodge(0.3)     # Adjust the space between bars
+# )
+
+
+ggline(datos.var %>% filter(Muestra != 'M17', Muestra != 'M34', Especie != 'Aristotelia/Crinodendron'), 
+       x = "Radiacion", 
+       y = 'Fenoles', 
+       add = "mean", 
+       color = "Especie"
+) +
+  xlab('Radiation Level') +
+  ylab('Phenols [mg/g]')
+
+# ggline(datos.var %>% 
+#          filter(Muestra != 'M17', Muestra != 'M34', Especie != 'Aristotelia/Crinodendron'), 
+#        x = "Radiacion", 
+#        y = 'Fenoles', 
+#        add = "mean", 
+#        color = "Especie") +
+#   geom_dl(aes(label = Especie, col = Especie), 
+#           method = "last.points") +
+#   theme(legend.position = "none")
+
+```
+
+
+
+### Análisis de radiación sobre FRAP en base a origen botánico
+
+```{r}
+# ggerrorplot(datos.var %>% filter(Muestra != 'M17', Muestra != 'M34', Especie != 'Aristotelia/Crinodendron'), x = "Radiacion", 
+#             y = 'FRAP', 
+#             desc_stat = "mean_se", 
+#             color = "Especie",
+#             position = position_dodge(0.3)     # Adjust the space between bars
+# )
+
+
+ggline(datos.var %>% filter(Muestra != 'M17', Muestra != 'M34', Especie != 'Aristotelia/Crinodendron'), 
+       x = "Radiacion", 
+       y = 'FRAP', 
+       add = "mean", 
+       color = "Especie")  +
+  xlab('Radiation Level') +
+  ylab('FRAP [mM Fe]')
+
+```
+
+
+
+### Análisis de radiación sobre DPPH en base a origen botánico
+
+```{r}
+# ggerrorplot(datos.var %>% filter(Muestra != 'M17', Muestra != 'M34', Especie != 'Aristotelia/Crinodendron'), x = "Radiacion", 
+#             y = 'DPPH', 
+#             desc_stat = "mean_se", 
+#             color = "Especie",
+#             position = position_dodge(0.3)     # Adjust the space between bars
+# )
+
+
+ggline(datos.var %>% filter(Muestra != 'M17', Muestra != 'M34', Especie != 'Aristotelia/Crinodendron'), 
+       x = "Radiacion", 
+       y = 'DPPH', 
+       add = "mean", 
+       color = "Especie"
+) +
+  xlab('Radiation level') +
+  ylab('DPPH [mg eq asc acid/kg]') 
+
+
+```
+
+
+

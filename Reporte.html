@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.35">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Carlos J. Gómez">
+<meta name="dcterms.date" content="2022-07-27">
+
+<title>Reporte Mieles</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+<script src="Reporte_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Reporte_files/libs/quarto-html/quarto.js"></script>
+<script src="Reporte_files/libs/quarto-html/popper.min.js"></script>
+<script src="Reporte_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Reporte_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Reporte_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Reporte_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Reporte_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Reporte_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Reporte_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Tabla de contenidos</h2>
+   
+  <ul>
+  <li><a href="#análisis-de-componentes-principales-pca" id="toc-análisis-de-componentes-principales-pca" class="nav-link active" data-scroll-target="#análisis-de-componentes-principales-pca"> <span class="header-section-number">1</span> Análisis de componentes principales PCA</a></li>
+  <li><a href="#análisis-con-todos-los-datos-sin-diferenciar-por-origen-botanico" id="toc-análisis-con-todos-los-datos-sin-diferenciar-por-origen-botanico" class="nav-link" data-scroll-target="#análisis-con-todos-los-datos-sin-diferenciar-por-origen-botanico"> <span class="header-section-number">2</span> Análisis con todos los datos sin diferenciar por origen botanico</a>
+  <ul class="collapse">
+  <li><a href="#fenoles-vs-radiación" id="toc-fenoles-vs-radiación" class="nav-link" data-scroll-target="#fenoles-vs-radiación"> <span class="header-section-number">2.1</span> Fenoles vs radiación</a></li>
+  <li><a href="#frap-vs-radiación" id="toc-frap-vs-radiación" class="nav-link" data-scroll-target="#frap-vs-radiación"> <span class="header-section-number">2.2</span> FRAP vs radiación</a></li>
+  </ul></li>
+  <li><a href="#dpph-vs-radiación" id="toc-dpph-vs-radiación" class="nav-link" data-scroll-target="#dpph-vs-radiación"> <span class="header-section-number">3</span> DPPH vs radiación</a></li>
+  <li><a href="#gráficos-de-correlación-sin-irradación" id="toc-gráficos-de-correlación-sin-irradación" class="nav-link" data-scroll-target="#gráficos-de-correlación-sin-irradación"> <span class="header-section-number">4</span> Gráficos de correlación sin irradación</a>
+  <ul class="collapse">
+  <li><a href="#fenoles-vs-frap" id="toc-fenoles-vs-frap" class="nav-link" data-scroll-target="#fenoles-vs-frap"> <span class="header-section-number">4.1</span> Fenoles vs FRAP</a></li>
+  <li><a href="#fenoles-vs-dpph" id="toc-fenoles-vs-dpph" class="nav-link" data-scroll-target="#fenoles-vs-dpph"> <span class="header-section-number">4.2</span> Fenoles vs DPPH</a></li>
+  <li><a href="#frap-vs-dpph" id="toc-frap-vs-dpph" class="nav-link" data-scroll-target="#frap-vs-dpph"> <span class="header-section-number">4.3</span> FRAP vs DPPH</a></li>
+  </ul></li>
+  <li><a href="#análisis-de-mieles-monoflorales-45" id="toc-análisis-de-mieles-monoflorales-45" class="nav-link" data-scroll-target="#análisis-de-mieles-monoflorales-45"> <span class="header-section-number">5</span> Análisis de mieles monoflorales (&gt; 45%)</a>
+  <ul class="collapse">
+  <li><a href="#cuáles-son-las-especies-más-frecuentes-en-las-muestras" id="toc-cuáles-son-las-especies-más-frecuentes-en-las-muestras" class="nav-link" data-scroll-target="#cuáles-son-las-especies-más-frecuentes-en-las-muestras"> <span class="header-section-number">5.1</span> ¿Cuáles son las especies más frecuentes en las muestras?</a></li>
+  <li><a href="#sec-monoflorales" id="toc-sec-monoflorales" class="nav-link" data-scroll-target="#sec-monoflorales"> <span class="header-section-number">5.2</span> ¿Cuáles son las principales especies monoflorales presentes en las muestras?</a></li>
+  <li><a href="#análisis-de-variables-en-las-muestras-monoflorales" id="toc-análisis-de-variables-en-las-muestras-monoflorales" class="nav-link" data-scroll-target="#análisis-de-variables-en-las-muestras-monoflorales"> <span class="header-section-number">5.3</span> Análisis de variables en las muestras monoflorales</a>
+  <ul class="collapse">
+  <li><a href="#análisis-de-radiación-sobre-fenoles-en-base-a-origen-botánico" id="toc-análisis-de-radiación-sobre-fenoles-en-base-a-origen-botánico" class="nav-link" data-scroll-target="#análisis-de-radiación-sobre-fenoles-en-base-a-origen-botánico"> <span class="header-section-number">5.3.1</span> Análisis de radiación sobre Fenoles en base a origen botánico</a></li>
+  <li><a href="#análisis-de-radiación-sobre-frap-en-base-a-origen-botánico" id="toc-análisis-de-radiación-sobre-frap-en-base-a-origen-botánico" class="nav-link" data-scroll-target="#análisis-de-radiación-sobre-frap-en-base-a-origen-botánico"> <span class="header-section-number">5.3.2</span> Análisis de radiación sobre FRAP en base a origen botánico</a></li>
+  <li><a href="#análisis-de-radiación-sobre-dpph-en-base-a-origen-botánico" id="toc-análisis-de-radiación-sobre-dpph-en-base-a-origen-botánico" class="nav-link" data-scroll-target="#análisis-de-radiación-sobre-dpph-en-base-a-origen-botánico"> <span class="header-section-number">5.3.3</span> Análisis de radiación sobre DPPH en base a origen botánico</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Reporte Mieles</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Carlos J. Gómez </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">July 27, 2022</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+</header>
+
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<section id="análisis-de-componentes-principales-pca" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Análisis de componentes principales PCA</h1>
+<div class="callout-important callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Importante
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Este análisis de PCA no es tan relevante en la medida que se hayan identificado las especies monoflorales más importantes, tal como se muestra en la sección <a href="#sec-monoflorales">Section&nbsp;5.2</a></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Reporte_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="Reporte_files/figure-html/unnamed-chunk-3-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="análisis-con-todos-los-datos-sin-diferenciar-por-origen-botanico" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Análisis con todos los datos sin diferenciar por origen botanico</h1>
+<section id="fenoles-vs-radiación" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="fenoles-vs-radiación"><span class="header-section-number">2.1</span> Fenoles vs radiación</h2>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Reporte_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="frap-vs-radiación" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="frap-vs-radiación"><span class="header-section-number">2.2</span> FRAP vs radiación</h2>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Reporte_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="dpph-vs-radiación" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> DPPH vs radiación</h1>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Reporte_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="gráficos-de-correlación-sin-irradación" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Gráficos de correlación sin irradación</h1>
+<section id="fenoles-vs-frap" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="fenoles-vs-frap"><span class="header-section-number">4.1</span> Fenoles vs FRAP</h2>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Reporte_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="fenoles-vs-dpph" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="fenoles-vs-dpph"><span class="header-section-number">4.2</span> Fenoles vs DPPH</h2>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Reporte_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="frap-vs-dpph" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="frap-vs-dpph"><span class="header-section-number">4.3</span> FRAP vs DPPH</h2>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Reporte_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="análisis-de-mieles-monoflorales-45" class="level1 page-columns page-full" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Análisis de mieles monoflorales (&gt; 45%)</h1>
+<p>(Sólo se muestran aquellas especies presentes en más de tres muestras)</p>
+<div class="cell">
+
+</div>
+<section id="cuáles-son-las-especies-más-frecuentes-en-las-muestras" class="level2 page-columns page-full" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="cuáles-son-las-especies-más-frecuentes-en-las-muestras"><span class="header-section-number">5.1</span> ¿Cuáles son las especies más frecuentes en las muestras?</h2>
+<div class="page-columns page-full"><p></p><div class="no-row-height column-margin column-container"><span class="aside"><span class="math inline">\(n\)</span> es el número de muestras que contienen la especie, sin considerar el porcentaje de la composición. Por ejemplo, de las 24 muestras: 21 de ellas contienen la especie <em>Lotus pedunculatus</em></span></div></div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Reporte_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="sec-monoflorales" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="sec-monoflorales"><span class="header-section-number">5.2</span> ¿Cuáles son las principales especies monoflorales presentes en las muestras?</h2>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Reporte_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="análisis-de-variables-en-las-muestras-monoflorales" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="análisis-de-variables-en-las-muestras-monoflorales"><span class="header-section-number">5.3</span> Análisis de variables en las muestras monoflorales</h2>
+<div class="cell">
+
+</div>
+<section id="análisis-de-radiación-sobre-fenoles-en-base-a-origen-botánico" class="level3" data-number="5.3.1">
+<h3 data-number="5.3.1" class="anchored" data-anchor-id="análisis-de-radiación-sobre-fenoles-en-base-a-origen-botánico"><span class="header-section-number">5.3.1</span> Análisis de radiación sobre Fenoles en base a origen botánico</h3>
+<p>(No se consideran muestras 17, 34 y la especie <em>Aristotelia/Crinodendron</em>)</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Reporte_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="análisis-de-radiación-sobre-frap-en-base-a-origen-botánico" class="level3" data-number="5.3.2">
+<h3 data-number="5.3.2" class="anchored" data-anchor-id="análisis-de-radiación-sobre-frap-en-base-a-origen-botánico"><span class="header-section-number">5.3.2</span> Análisis de radiación sobre FRAP en base a origen botánico</h3>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Reporte_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="análisis-de-radiación-sobre-dpph-en-base-a-origen-botánico" class="level3" data-number="5.3.3">
+<h3 data-number="5.3.3" class="anchored" data-anchor-id="análisis-de-radiación-sobre-dpph-en-base-a-origen-botánico"><span class="header-section-number">5.3.3</span> Análisis de radiación sobre DPPH en base a origen botánico</h3>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Reporte_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
